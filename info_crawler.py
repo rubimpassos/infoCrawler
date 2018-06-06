@@ -56,9 +56,7 @@ def parsed_description(description):
         return description_contents
 
     for el in soup:
-        if el.name not in ['p', 'div']:
-            continue
-
+        extracted_content, content_type = "", ""
         if el.name == 'div' and el.img:
             extracted_content = extract_image_url(el.img)
             content_type = "image"
@@ -68,8 +66,6 @@ def parsed_description(description):
         elif el.name == 'p':
             extracted_content = extract_text_content(el)
             content_type = "text"
-        else:
-            continue
 
         if not extracted_content:
             continue
