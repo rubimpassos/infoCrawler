@@ -84,19 +84,19 @@ def parse_item(item):
     :param item: A beautifulsoup element with name 'item'
     :return:
     """
+    rules = {
+        'title': str,
+        'link': str,
+        'description': parsed_description
+    }
     new_item = {}
 
-    title = item.find('title')
-    if title:
-        new_item[title.name] = title.text
+    for tag, parser in rules.items():
+        element = item.find(tag)
+        if not element:
+            continue
 
-    link = item.find('link')
-    if link:
-        new_item[link.name] = link.text
-
-    description = item.find('description')
-    if description:
-        new_item[description.name] = parsed_description(description.text)
+        new_item[tag] = parser(element.text)
 
     return new_item
 
