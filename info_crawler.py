@@ -23,7 +23,7 @@ def request_url_data(url, *args, **kwargs):
     return None
 
 
-def parse_soup(data, *args, **kwargs):
+def soup_this(data, *args, **kwargs):
     try:
         soup = BeautifulSoup(data, *args, **kwargs)
         return soup
@@ -33,40 +33,56 @@ def parse_soup(data, *args, **kwargs):
     return None
 
 
+def get_content_obj(element, _type, process):
+    obj = {}
+    content = process(element)
+
+    if content:
+        obj['type'] = _type
+        obj['content'] = content
+
+    return obj
+
+
+def process_image_content(element):
+    return element['src']
+
+
+def process_text_content(element):
+    text = element.text or ""
+    return element.text.strip()
+
+
+def process_links_content(element):
+    links = []
+    for link in element.find_all('a'):
+        links.append(link.get('href'))
+
+    return links
+
+
 def parsed_description(description):
     """Returns images, links and paragraphs of the description
     :rtype: dict
     """
-    soup = parse_soup(description, "html.parser")
-    content = []
+    description_contents = []
+    soup = soup_this(description, "html.parser")
 
     if soup:
         for el in soup:
-            if el.name == 'div':
-                if el.img:
-                    content.append({
-                        'type': "image",
-                        'content': el.img['src']
-                    })
-                # check if div<ul<li<a exists
-                elif el.ul and el.ul.li and el.ul.li.a:
-                    links = []
-                    for link in el.ul:
-                        a_tag = link.find('a')
-                        if a_tag != -1 and a_tag.get('href'):
-                            links.append(a_tag.get('href'))
+            el_content = {}
 
-                    if len(links) > 0:
-                        content.append({
-                            'type': "links",
-                            'content': links
-                        })
-            elif el.name == 'p' and el.text and el.text.strip():
-                content.append({
-                    'type': "text",
-                    'content': el.text.strip()
-                })
-    return content
+            if el.name == 'div' and el.img:
+                el_content = get_content_obj(el.img, "image", process_image_content)
+            elif el.name == 'div' and el.ul:
+                el_content = get_content_obj(el.ul, "links", process_links_content)
+            elif el.name == 'p':
+                el_content = get_content_obj(el, "text", process_text_content)
+
+            if el_content:
+                description_contents.append(el_content)
+
+    return description_contents
 
 
 def get_feed_items(items_soup):
@@ -95,7 +111,7 @@ def parse_feed(text):
     """
 
     feed = {'feed': []}
-    xml = parse_soup(text, "xml")
+    xml = soup_this(text, "xml")
     if xml:
         items = get_feed_items(xml.find_all('item'))
         feed['feed'] = items
