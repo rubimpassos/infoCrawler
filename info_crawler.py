@@ -28,26 +28,16 @@ def retrieve_feed(url, **kwargs):
     return content
 
 
-def mount_description_content(_type, content):
-    obj = {}
-
-    if content:
-        obj['type'] = _type
-        obj['content'] = content
-
-    return obj
-
-
-def process_image_content(element):
+def extract_image_url(element):
     return element['src']
 
 
-def process_text_content(element):
+def extract_text_content(element):
     text = element.text or ""
     return element.text.strip()
 
 
-def process_links_content(element):
+def extract_links(element):
     links = []
     for link in element.find_all('a'):
         links.append(link.get('href'))
@@ -62,22 +52,32 @@ def parsed_description(description):
     description_contents = []
     soup = BeautifulSoup(description, "html.parser")
 
-    if soup:
-        for el in soup:
-            el_content = {}
+    if not soup:
+        return description_contents
 
-            if el.name == 'div' and el.img:
-                content = process_image_content(el.img)
-                el_content = mount_description_content("image", content)
-            elif el.name == 'div' and el.ul:
-                content = process_links_content(el.ul)
-                el_content = mount_description_content("links", content)
-            elif el.name == 'p':
-                content = process_text_content(el)
-                el_content = mount_description_content("text", content)
+    for el in soup:
+        if el.name not in ['p', 'div']:
+            continue
 
-            if el_content:
-                description_contents.append(el_content)
+        if el.name == 'div' and el.img:
+            extracted_content = extract_image_url(el.img)
+            content_type = "image"
+        elif el.name == 'div' and el.ul:
+            extracted_content = extract_links(el.ul)
+            content_type = "links"
+        elif el.name == 'p':
+            extracted_content = extract_text_content(el)
+            content_type = "text"
+        else:
+            continue
+
+        if not extracted_content:
+            continue
+
+        description_contents.append({
+            'type': content_type,
+            'content': extracted_content
+        })
 
     return description_contents
 
@@ -125,7 +125,7 @@ def parse_feed(text):
 
 
 def main(args):
-    content = retrieve_feed("https://revistaautoesporte.globo.com/rss/ultimas/f.xml")
+    content = retrieve_feed("https://revistaautoesporte.globo.com/rss/ultimas/feed.xml")
 
     if not content:
         logger.error("No feed content found!")
