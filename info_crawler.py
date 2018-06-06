@@ -8,18 +8,20 @@ from bs4 import BeautifulSoup
 
 
 logger = logging.getLogger(__name__)
-ss = requests.Session()
-adapter = requests.adapters.HTTPAdapter(max_retries=3)
-ss.mount('http://', adapter)
-ss.mount('https://', adapter)
 
 
 def retrieve_feed(url, **kwargs):
     content = ""
+
+    session = requests.Session()
+    adapter = requests.adapters.HTTPAdapter(max_retries=3)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+
     try:
-        request = ss.get(url, **kwargs)
-        request.raise_for_status()
-        content = request.content
+        response = session.get(url, **kwargs)
+        response.raise_for_status()
+        content = response.content
     except Exception as ex:
         logger.exception(ex)
 
