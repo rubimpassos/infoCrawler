@@ -5,37 +5,29 @@ import sys
 import requests
 
 from bs4 import BeautifulSoup
-from requests import Timeout, ConnectionError, TooManyRedirects, RequestException
 
 
 logger = logging.getLogger(__name__)
+ss = requests.Session()
+adapter = requests.adapters.HTTPAdapter(max_retries=3)
+ss.mount('http://', adapter)
+ss.mount('https://', adapter)
 
 
-def request_url_data(url, *args, **kwargs):
+def retrieve_feed(url, **kwargs):
+    content = ""
     try:
-        request = requests.get(url, *args, **kwargs)
+        request = ss.get(url, **kwargs)
         request.raise_for_status()
-        if request.status_code == 200:
-            return request.content
-    except (Timeout, ConnectionError, TooManyRedirects, RequestException) as ex:
+        content = request.content
+    except Exception as ex:
         logger.exception(ex)
 
-    return None
+    return content
 
 
-def soup_this(data, *args, **kwargs):
-    try:
-        soup = BeautifulSoup(data, *args, **kwargs)
-        return soup
-    except Exception as e:
-        logger.exception(e)
-
-    return None
-
-
-def get_content_obj(element, _type, process):
+def mount_description_content(_type, content):
     obj = {}
-    content = process(element)
 
     if content:
         obj['type'] = _type
@@ -66,18 +58,21 @@ def parsed_description(description):
     :rtype: dict
     """
     description_contents = []
-    soup = soup_this(description, "html.parser")
+    soup = BeautifulSoup(description, "html.parser")
 
     if soup:
         for el in soup:
             el_content = {}
 
             if el.name == 'div' and el.img:
-                el_content = get_content_obj(el.img, "image", process_image_content)
+                content = process_image_content(el.img)
+                el_content = mount_description_content("image", content)
             elif el.name == 'div' and el.ul:
-                el_content = get_content_obj(el.ul, "links", process_links_content)
+                content = process_links_content(el.ul)
+                el_content = mount_description_content("links", content)
             elif el.name == 'p':
-                el_content = get_content_obj(el, "text", process_text_content)
+                content = process_text_content(el)
+                el_content = mount_description_content("text", content)
 
             if el_content:
                 description_contents.append(el_content)
@@ -85,48 +80,60 @@ def parsed_description(description):
     return description_contents
 
 
-def get_feed_items(items_soup):
-    feed_items = []
-    fields_rules = {
-        'title': str,
-        'link': str,
-        'description': parsed_description
-    }
+def parse_item(item):
+    """
+    Return a item dict with a formated title, link and description
+    :param item: A beautifulsoup element with name 'item'
+    :return:
+    """
+    new_item = {}
 
-    for item in items_soup:
-        el = {}
-        for field in fields_rules.keys():
-            if item.find(field):
-                el[field] = fields_rules[field](item.find(field).text)
+    title = item.find('title')
+    if title:
+        new_item[title.name] = title.text
 
-        feed_items.append(el)
+    link = item.find('link')
+    if link:
+        new_item[link.name] = link.text
 
-    return feed_items
+    description = item.find('description')
+    if description:
+        new_item[description.name] = parsed_description(description.text)
+
+    return new_item
 
 
 def parse_feed(text):
-    """Parse xml text and format into a dict of feeds
+    """Parse a xml and format into a dict of feeds
     :param text: a xml data text
     :rtype: dict
     """
+    items = []
+    xml = BeautifulSoup(text, "xml")
 
-    feed = {'feed': []}
-    xml = soup_this(text, "xml")
-    if xml:
-        items = get_feed_items(xml.find_all('item'))
-        feed['feed'] = items
+    for item in xml.find_all('item'):
+        new_item = parse_item(item)
 
-    return feed
+        if new_item:
+            items.append(new_item)
+
+        items.append(new_item)
+
+    return {'feed': items}
 
 
-def main(arg):
-    data = request_url_data("https://revistaautoesporte.globo.com/rss/ultimas/feed.xml")
+def main(args):
+    content = retrieve_feed("https://revistaautoesporte.globo.com/rss/ultimas/f.xml")
 
-    if data:
-        feed = parse_feed(data)
-        feed_json = json.dumps(feed, ensure_ascii=False)
-        print(feed_json)
+    if not content:
+        logger.error("No feed content found!")
+        return -1
+
+    d = parse_feed(content)
+    feed_json = json.dumps(d, ensure_ascii=False)
+
+    return feed_json
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    print(main(sys.argv[1:]))
