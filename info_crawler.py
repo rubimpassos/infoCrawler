@@ -1,87 +1,115 @@
+import logging
 import json
 import sys
 
 import requests
-import xmltodict
 
 from bs4 import BeautifulSoup
-from xml.parsers.expat import ExpatError
+from requests import Timeout, ConnectionError, TooManyRedirects, RequestException
+
+
+logger = logging.getLogger(__name__)
+
+
+def request_url_data(url, *args, **kwargs):
+    try:
+        request = requests.get(url, *args, **kwargs)
+        request.raise_for_status()
+        if request.status_code == 200:
+            return request.content
+    except (Timeout, ConnectionError, TooManyRedirects, RequestException) as ex:
+        logger.exception(ex)
+
+    return None
+
+
+def parse_soup(data, *args, **kwargs):
+    try:
+        soup = BeautifulSoup(data, *args, **kwargs)
+        return soup
+    except Exception as e:
+        logger.exception(e)
+
+    return None
 
 
 def parsed_description(description):
     """Returns images, links and paragraphs of the description
     :rtype: dict
     """
-    soup = BeautifulSoup(description, "html.parser")
+    soup = parse_soup(description, "html.parser")
     content = []
-    for el in soup:
-        if el.name == 'div':
-            if el.img:
-                content.append({
-                    'type': "image",
-                    'content': el.img['src']
-                })
-            # check if div<ul<li<a exists
-            elif el.ul and el.ul.li and el.ul.li.a:
-                links = []
-                for link in el.ul:
-                    a_tag = link.find('a')
-                    if a_tag != -1 and a_tag.get('href'):
-                        links.append(a_tag.get('href'))
 
-                if len(links) > 0:
+    if soup:
+        for el in soup:
+            if el.name == 'div':
+                if el.img:
                     content.append({
-                        'type': "links",
-                        'content': links
+                        'type': "image",
+                        'content': el.img['src']
                     })
-        elif el.name == 'p' and el.text and el.text.strip():
-            content.append({
-                'type': "text",
-                'content': el.text.strip()
-            })
+                # check if div<ul<li<a exists
+                elif el.ul and el.ul.li and el.ul.li.a:
+                    links = []
+                    for link in el.ul:
+                        a_tag = link.find('a')
+                        if a_tag != -1 and a_tag.get('href'):
+                            links.append(a_tag.get('href'))
+
+                    if len(links) > 0:
+                        content.append({
+                            'type': "links",
+                            'content': links
+                        })
+            elif el.name == 'p' and el.text and el.text.strip():
+                content.append({
+                    'type': "text",
+                    'content': el.text.strip()
+                })
     return content
 
 
-def read_xml(url):
-    """Returns the xml data from url
+def get_feed_items(items_soup):
+    feed_items = []
+    fields_rules = {
+        'title': str,
+        'link': str,
+        'description': parsed_description
+    }
+
+    for item in items_soup:
+        el = {}
+        for field in fields_rules.keys():
+            if item.find(field):
+                el[field] = fields_rules[field](item.find('title').text)
+
+        feed_items.append(el)
+
+    return feed_items
+
+
+def parse_feed(text):
+    """Parse xml text and format into a dict of feeds
+    :param text: a xml data text
     :rtype: dict
     """
-    reponse = requests.get(url)
-    xml_dict = {}
 
-    if reponse.status_code == 200:
-        try:
-            xml_dict = xmltodict.parse(reponse.content)
-        except ExpatError:
-            pass
+    feed = {'feed': []}
+    xml = parse_soup(text, "xml")
+    if xml:
+        items = get_feed_items(xml.find_all('item'))
+        feed['feed'] = items
 
-    return xml_dict
+    return feed
 
 
 def main(arg):
-    xml = read_xml("https://revistaautoesporte.globo.com/rss/ultimas/feed.xml")
+    data = request_url_data("https://revistaautoesporte.globo.com/rss/ultimas/feed.xml")
 
-    feed = {'feed': []}
-    valid_fields = ['title', 'link', 'description']
-
-    #
-    if 'rss' in xml and 'channel' in xml.get('rss', {}):
-        channel = xml['rss'].get('channel', {})
-        items = channel.get('item', [])
-        for info in items:
-            # clean nonessential fields
-            invalid_fields = list(set(info.keys()) - set(valid_fields))
-            for field in invalid_fields:
-                info.pop(field, None)
-
-            if valid_fields[2] in info:
-                info['content'] = parsed_description(info[valid_fields[2]])
-                info.pop(valid_fields[2], None)
-
-            feed['feed'].append(info)
-
-    feed_json = json.dumps(feed, ensure_ascii=False, indent=True)
-    print(feed_json)
+    if data:
+        feed = parse_feed(data)
+        feed_json = json.dumps(feed, ensure_ascii=False)
+        print(feed_json)
 
 
 if __name__ == '__main__':
