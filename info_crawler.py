@@ -81,7 +81,7 @@ def get_feed_items(items_soup):
         el = {}
         for field in fields_rules.keys():
             if item.find(field):
-                el[field] = fields_rules[field](item.find('title').text)
+                el[field] = fields_rules[field](item.find(field).text)
 
         feed_items.append(el)
 
