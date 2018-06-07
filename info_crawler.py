@@ -111,9 +111,8 @@ def parse_feed(text):
 
     for item in xml.find_all('item'):
         new_item = parse_item(item)
-
-        if new_item:
-            items.append(new_item)
+        if not new_item:
+            continue
 
         items.append(new_item)
 
