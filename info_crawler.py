@@ -1,3 +1,4 @@
+import argparse
 import logging
 import json
 import sys
@@ -119,12 +120,32 @@ def parse_feed(text):
     return {'feed': items}
 
 
-def main(args):
-    content = retrieve_feed("https://revistaautoesporte.globo.com/rss/ultimas/feed.xml")
+def arguments(args=None):
+    parser = argparse.ArgumentParser(description='Export rss feed as json.')
+    parser.add_argument('url', help='Feed url.')
+    parser.add_argument('-v', '--verbose', type=int, choices=[1, 2], default=1)
 
+    return parser.parse_args(args)
+
+
+def verbosity(level):
+    if level < 2:
+        return
+
+    root = logging.getLogger()
+    console = logging.StreamHandler(sys.stdout)
+    root.addHandler(console)
+    root.setLevel(logging.DEBUG)
+
+
+def main():
+    options = arguments()
+    verbosity(options.verbose)
+
+    content = retrieve_feed(options.url)
     if not content:
-        logger.error("No feed content found!")
-        return -1
+        logger.error("No feed content!")
+        return
 
     d = parse_feed(content)
     feed_json = json.dumps(d, ensure_ascii=False)
@@ -133,4 +154,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    print(main(sys.argv[1:]))
+    print(main())
