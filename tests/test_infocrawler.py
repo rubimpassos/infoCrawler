@@ -8,18 +8,19 @@ from bs4 import BeautifulSoup
 
 
 class InfoCrawlerTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        self.xml_path = os.path.join(dir_path, "feed.xml")
-        self.json_path = os.path.join(dir_path, "feed.json")
+        cls.xml_path = os.path.join(dir_path, "feed.xml")
+        cls.json_path = os.path.join(dir_path, "feed.json")
 
-        with open(self.xml_path, encoding='utf-8') as f:
-            self.xml_text = f.read()
-            self.xml_soup = BeautifulSoup(self.xml_text, "xml")
+        with open(cls.xml_path, encoding='utf-8') as f:
+            cls.xml_text = f.read()
+            cls.xml_soup = BeautifulSoup(cls.xml_text, "xml")
 
-        with open(self.json_path, encoding='utf-8') as f:
-            self.d_json = json.load(f)
-            self.feed_items = self.d_json.get('feed')
+        with open(cls.json_path, encoding='utf-8') as f:
+            cls.d_json = json.load(f)
+            cls.feed_items = cls.d_json.get('feed')
 
     def test_retrieve_feed_content(self):
         rss_url = "https://revistaautoesporte.globo.com/rss/ultimas/feed.xml"
