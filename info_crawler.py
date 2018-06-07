@@ -34,7 +34,7 @@ def extract_image_url(element):
 
 def extract_text_content(element):
     text = element.text or ""
-    return element.text.strip()
+    return text.strip()
 
 
 def extract_links(element):
