@@ -1,4 +1,18 @@
-<item>
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel>
+  <title><![CDATA[Feed de Exemplo]]></title>
+  <link>https://exemple.org/</link>
+  <description></description>
+  <language>pt-BR</language>
+  <copyright>© Todos os direitos reservados.</copyright>
+  <image>
+    <url>https://exemple.org/imagem.png</url>
+    <title><![CDATA[Título do feed]]></title>
+    <link>https://exemple.org/</link>
+  </image>
+  
+  <item>
     <title><![CDATA[Volkswagen Arteon aparece às vésperas do Salão de Genebra]]></title>
     <description><![CDATA[<div class="foto componente_materia midia-largura-620">
     <img alt="Volkswagen Arteon (Foto: Divulgação)" height="413" id="209451" src="http://s2.glbimg.com/DIgFxpN0aAu99uvuZ3WmSqAUV2E=/620x413/e.glbimg.com/og/ed/f/original/2017/03/06/1_WKIn5xh.jpg" title="Volkswagen Arteon (Foto: Divulgação)" width="620" /><label class="foto-legenda">Volkswagen Arteon (Foto: Divulga&ccedil;&atilde;o)</label></div>
@@ -46,9 +60,9 @@
 <p>
     &nbsp;</p>
 ]]></description>
-    <link>
-        http://revistaautoesporte.globo.com/Noticias/noticia/2017/03/volkswagen-arteon-aparece-vesperas-do-salao-de-genebra.html
-    </link>
+    <link>http://revistaautoesporte.globo.com/Noticias/noticia/2017/03/volkswagen-arteon-aparece-vesperas-do-salao-de-genebra.html</link>
     <dc:creator>Da redação de Auto Esporte</dc:creator>
     <guid>1139465</guid>
-</item>
+  </item>
+</channel>
+</rss>
