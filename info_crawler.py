@@ -23,6 +23,7 @@ def retrieve_feed(url, **kwargs):
         response = session.get(url, **kwargs)
         response.raise_for_status()
         content = response.content
+        session.close()
     except Exception as ex:
         logger.exception(ex)
 
