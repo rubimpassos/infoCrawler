@@ -4,7 +4,8 @@ from unittest import TestCase
 
 from bs4 import BeautifulSoup
 
-from info_crawler import extract_image_url, extract_text_content, extract_links, parsed_description, parse_item
+from info_crawler import extract_image_url, extract_text_content, extract_links, parsed_description, parse_item, \
+    parse_feed
 
 
 class InfoCrawlerTest(TestCase):
@@ -14,7 +15,8 @@ class InfoCrawlerTest(TestCase):
         self.json_path = os.path.join(dir_path, "feed.json")
 
         with open(self.xml_path, encoding='utf-8') as f:
-            self.xml_soup = BeautifulSoup(f, "xml")
+            self.xml_text = f.read()
+            self.xml_soup = BeautifulSoup(self.xml_text, "xml")
 
         with open(self.json_path, encoding='utf-8') as f:
             self.d_json = json.load(f)
@@ -67,3 +69,7 @@ class InfoCrawlerTest(TestCase):
         parsed_item = parse_item(x_item)
 
         self.assertEqual(str(parsed_item), str(j_item))
+
+    def test_parse_feed(self):
+        d_feed = parse_feed(self.xml_text)
+        self.assertEqual(str(d_feed), str(self.d_json))
