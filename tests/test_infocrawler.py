@@ -62,7 +62,7 @@ class InfoCrawlerTest(TestCase):
         self.assertListEqual(extracted_links, links)
 
     def test_parsed_description(self):
-        j_content = self.feed_items.first().get('content')
+        j_content = self.feed_items[0].get('description')
         description = self.xml_soup.find('item').find('description').text
         extracted_content = info_crawler.parsed_description(description)
 
