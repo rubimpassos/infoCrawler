@@ -18,6 +18,7 @@ class InfoCrawlerTest(TestCase):
 
         with open(self.json_path, encoding='utf-8') as f:
             self.d_json = json.load(f)
+            self.feed_items = self.d_json.get('feed')
 
     def test_extract_image_url(self):
         image_url = "http://www.exemple.org/image.jpg"
@@ -54,9 +55,15 @@ class InfoCrawlerTest(TestCase):
         self.assertListEqual(extracted_links, links)
 
     def test_parsed_description(self):
-        feed = self.d_json.get('feed')
-        j_content = feed[0].get('content')
+        j_content = self.feed_items.first().get('content')
         description = self.xml_soup.find('item').find('description').text
         extracted_content = parsed_description(description)
 
         self.assertEqual(str(extracted_content), str(j_content))
+
+    def test_parse_item(self):
+        j_item = self.feed_items[0]
+        x_item = self.xml_soup.find('item')
+        parsed_item = parse_item(x_item)
+
+        self.assertEqual(str(parsed_item), str(j_item))
