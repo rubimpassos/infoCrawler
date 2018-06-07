@@ -2,10 +2,9 @@ import json
 import os
 from unittest import TestCase
 
-from bs4 import BeautifulSoup
+import info_crawler
 
-from info_crawler import extract_image_url, extract_text_content, extract_links, parsed_description, parse_item, \
-    parse_feed
+from bs4 import BeautifulSoup
 
 
 class InfoCrawlerTest(TestCase):
@@ -22,11 +21,17 @@ class InfoCrawlerTest(TestCase):
             self.d_json = json.load(f)
             self.feed_items = self.d_json.get('feed')
 
+    def test_retrieve_feed_content(self):
+        rss_url = "https://revistaautoesporte.globo.com/rss/ultimas/feed.xml"
+        content = info_crawler.retrieve_feed(rss_url)
+
+        self.assertIsInstance(content, bytes)
+
     def test_extract_image_url(self):
         image_url = "http://www.exemple.org/image.jpg"
         html = '<img src="{}" alt="Exemple Image" />'.format(image_url)
         soup = BeautifulSoup(html, "html.parser")
-        extracted_url = extract_image_url(soup.img)
+        extracted_url = info_crawler.extract_image_url(soup.img)
 
         self.assertEqual(extracted_url, image_url)
 
@@ -34,7 +39,7 @@ class InfoCrawlerTest(TestCase):
         text = "Exemple of captured text"
         html = '<p>{}</p>'.format(text)
         soup = BeautifulSoup(html, "html.parser")
-        extracted_text = extract_text_content(soup.p)
+        extracted_text = info_crawler.extract_text_content(soup.p)
 
         self.assertEqual(extracted_text, text)
 
@@ -52,24 +57,24 @@ class InfoCrawlerTest(TestCase):
         </ul>
         """.format(*links)
         soup = BeautifulSoup(html, "html.parser")
-        extracted_links = extract_links(soup.ul)
+        extracted_links = info_crawler.extract_links(soup.ul)
 
         self.assertListEqual(extracted_links, links)
 
     def test_parsed_description(self):
         j_content = self.feed_items.first().get('content')
         description = self.xml_soup.find('item').find('description').text
-        extracted_content = parsed_description(description)
+        extracted_content = info_crawler.parsed_description(description)
 
         self.assertEqual(str(extracted_content), str(j_content))
 
     def test_parse_item(self):
         j_item = self.feed_items[0]
         x_item = self.xml_soup.find('item')
-        parsed_item = parse_item(x_item)
+        parsed_item = info_crawler.parse_item(x_item)
 
         self.assertEqual(str(parsed_item), str(j_item))
 
     def test_parse_feed(self):
-        d_feed = parse_feed(self.xml_text)
+        d_feed = info_crawler.parse_feed(self.xml_text)
         self.assertEqual(str(d_feed), str(self.d_json))
