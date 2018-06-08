@@ -36,17 +36,11 @@ def parsed_description(description):
         return description_contents
 
     for el in soup:
-        extractor = Extractor(el)
-        content_type = extractor.content_type
-        extracted_content = extractor.extract()
-
-        if not extracted_content:
+        d = Extractor(el).as_dict()
+        if not d:
             continue
 
-        description_contents.append({
-            'type': content_type,
-            'content': extracted_content
-        })
+        description_contents.append(d)
 
     return description_contents
 

@@ -53,3 +53,13 @@ class Extractor:
             links.append(link.get('href'))
 
         return links
+
+    def as_dict(self):
+        if not self.is_valid():
+            return {}
+
+        content = self.extract()
+        if not content:
+            return {}
+
+        return {'type': self.content_type, 'content': content}
