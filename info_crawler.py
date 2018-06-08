@@ -7,6 +7,7 @@ import requests
 
 from bs4 import BeautifulSoup
 
+from rsscrawler.extractor import Extractor
 
 logger = logging.getLogger(__name__)
 
@@ -24,23 +25,6 @@ def retrieve_feed(url, **kwargs):
     return content
 
 
-def extract_image_url(element):
-    return element['src']
-
-
-def extract_text_content(element):
-    text = element.text or ""
-    return text.strip()
-
-
-def extract_links(element):
-    links = []
-    for link in element.find_all('a'):
-        links.append(link.get('href'))
-
-    return links
-
-
 def parsed_description(description):
     """Returns images, links and paragraphs of the description
     :rtype: dict
@@ -52,16 +36,9 @@ def parsed_description(description):
         return description_contents
 
     for el in soup:
-        extracted_content, content_type = "", ""
-        if el.name == 'div' and el.img:
-            extracted_content = extract_image_url(el.img)
-            content_type = "image"
-        elif el.name == 'div' and el.ul:
-            extracted_content = extract_links(el.ul)
-            content_type = "links"
-        elif el.name == 'p':
-            extracted_content = extract_text_content(el)
-            content_type = "text"
+        extractor = Extractor(el)
+        content_type = extractor.content_type
+        extracted_content = extractor.extract(content_type)
 
         if not extracted_content:
             continue

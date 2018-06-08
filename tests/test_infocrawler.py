@@ -5,11 +5,10 @@ import unittest
 from unittest import TestCase
 
 import mock
+from bs4 import BeautifulSoup
 from requests import HTTPError
 
 import info_crawler
-
-from bs4 import BeautifulSoup
 
 
 class RetrieveFeedTest(TestCase):
@@ -51,45 +50,6 @@ class RetrieveFeedTest(TestCase):
         self.assertRaises(HTTPError, info_crawler.retrieve_feed, 'some url')
         session_instance.mount.assert_called()
         session_instance.get.assert_called_with('some url')
-
-
-class ExtractHtmlTest(TestCase):
-    def test_extract_image_url(self):
-        expected_url = "http://www.exemple.org/image.jpg"
-
-        html_content = '<img src="{}" alt="Exemple Image" />'.format(expected_url)
-        soup = BeautifulSoup(html_content, "html.parser")
-        result_url = info_crawler.extract_image_url(soup.img)
-
-        self.assertEqual(expected_url, result_url)
-
-    def test_extract_text_content(self):
-        expected_text = "Exemple of captured text"
-
-        html_content = '<p>{}</p>'.format(expected_text)
-        soup = BeautifulSoup(html_content, "html.parser")
-        result_text = info_crawler.extract_text_content(soup.p)
-
-        self.assertEqual(expected_text, result_text)
-
-    def test_extract_links(self):
-        expected_links = [
-            "http://www.exemple.org",
-            "http://www.google.com",
-            "http://www.facebook.com",
-        ]
-
-        html_content = """
-        <ul>
-            <li><a href="{}" alt="exemple" >exemple</a></li>
-            <li><a href="{}" alt="google" >google</a></li>
-            <li><a href="{}" alt="facebook" >facebook</a></li>
-        </ul>
-        """.format(*expected_links)
-        soup = BeautifulSoup(html_content, "html.parser")
-        result_links = info_crawler.extract_links(soup.ul)
-
-        self.assertListEqual(expected_links, result_links)
 
 
 class CrawlerTest(TestCase):
