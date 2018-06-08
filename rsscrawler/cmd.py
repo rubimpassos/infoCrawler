@@ -1,7 +1,8 @@
-import argparse
 import json
 import logging
+import os
 import sys
+from argparse import ArgumentParser, FileType
 from pathlib import Path
 
 from rsscrawler.crawler import parse_feed
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def arguments(args=None):
-    parser = argparse.ArgumentParser(description='Export rss feed as json.')
+    parser = ArgumentParser(description='Export rss feed as json.')
     parser.add_argument('url', help='Feed url.')
     parser.add_argument('-f', '--file', help='Save output in file path.', type=Path, default=None)
     parser.add_argument('-v', '--verbose', type=int, choices=[1, 2], default=1)
@@ -35,8 +36,7 @@ def main():
     verbosity(options.verbose)
 
     if options.file and options.file.exists():
-        logger.error("File already exists!")
-        return -1
+        sys.exit("File already exists!")
 
     logger.info("Requesting feed...")
     content = retrieve_feed(options.url)

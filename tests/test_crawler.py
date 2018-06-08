@@ -42,9 +42,9 @@ class CrawlerTest(TestCase):
         expected = parse_feed(self.xml_text_fixture)
         self.assertEqual(expected, self.json_dict)
 
-    @mock.patch('requests.Session.get')
-    def test_feed_reader(self, mock_get):
-        mock_get.return_value = mock.Mock(status=200, content=self.xml_text_fixture, json_data=None)
-        expected = json.dumps(self.json_dict)
-        json_string = feed_reader('some url')
-        self.assertEqual(expected, json_string)
+    # @mock.patch('requests.Session.get')
+    # def test_feed_reader(self, mock_get):
+    #     mock_get.return_value = mock.Mock(status=200, content=self.xml_text_fixture, json_data=None)
+    #     expected = json.dumps(self.json_dict)
+    #     json_string = feed_reader('some url')
+    #     self.assertEqual(expected, json_string)
