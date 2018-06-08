@@ -11,9 +11,16 @@ Requeriments
 * requests
 * mock
 
-
-How to use
+How to Install and Use
 ----------------------
+
+Download the project zip
+ 
+ [InfoCrawler](https://github.com/rubimpassos/infoCrawler/archive/master.zip)
+
+Install Python 3.6 or greater and run
+
+    pip install -r infoCrawler/requirements.txt
 
 You can use as CLI
     
