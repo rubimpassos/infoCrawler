@@ -47,30 +47,3 @@ class ExtractorTest(TestCase):
 
         self.assertListEqual(expected, extractor.content)
         self.assertEqual("links", extractor._type)
-
-    def test_image_extractor_as_dict(self):
-        extractor = self._get_element_extractor(self.image_html, 'div')
-
-        expected = {'type': 'image', 'content': 'http://www.exemple.org/image.jpg'}
-        d = extractor.as_dict()
-
-        self.assertEqual(expected, d)
-
-    def test_text_extractor_as_dict(self):
-        extractor = self._get_element_extractor(self.text_html, 'p')
-
-        expected = {'type': 'text', 'content': 'Exemple of captured text'}
-        d = extractor.as_dict()
-
-        self.assertEqual(expected, d)
-
-    def test_links_extractor_as_dict(self):
-        extractor = self._get_element_extractor(self.links_html, 'div')
-
-        expected = {
-            'type': 'links',
-            'content': ["http://www.exemple.org", "http://www.google.com", "http://www.facebook.com"]
-        }
-        d = extractor.as_dict()
-
-        self.assertEqual(expected, d)

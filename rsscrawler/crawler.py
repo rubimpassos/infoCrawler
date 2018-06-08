@@ -21,11 +21,16 @@ def parse_description(description):
         return description_contents
 
     for el in soup:
-        d = Extractor(el).as_dict()
-        if not d:
+        extractor = Extractor(el)
+        _type, content = extractor._type, extractor.content
+
+        if not _type or not content:
             continue
 
-        description_contents.append(d)
+        description_contents.append({
+            'type': _type,
+            'content': content
+        })
 
     return description_contents
 
