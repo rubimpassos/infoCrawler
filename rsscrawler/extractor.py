@@ -1,6 +1,4 @@
 class Extractor:
-    valid_types = ('image', 'text', 'links')
-
     def __init__(self, element):
         """
         Extract elements by type that can be serialized
@@ -11,34 +9,34 @@ class Extractor:
         :type element: BeautifulSoup object
         """
         self.element = element
-        self.content_type = self.get_content_type()
+        self._type, self.content = self.extract()
 
-    def get_content_type(self):
+    def is_image(self):
+        return self.element.name and self.element.img
 
-        if not self.element.name:
-            return ''
+    def is_text(self):
+        return self.element.name == 'p'
 
-        if self.element.name == 'p':
-            return 'text'
-        elif self.element.ul:
-            return 'links'
-        elif self.element.img:
-            return 'image'
-
-        return ""
-
-    def is_valid(self):
-        return self.content_type in self.valid_types
+    def is_links(self):
+        return self.element.name and self.element.ul
 
     def extract(self):
-        if not self.is_valid():
-            return ""
+        _type = ""
 
-        method = getattr(self, "_extract_"+self.content_type, None)
+        if self.is_image():
+            _type = "image"
+
+        if self.is_text():
+            _type = "text"
+
+        if self.is_links():
+            _type = "links"
+
+        method = getattr(self, "_extract_"+_type, None)
         if not callable(method):
-            return ""
+            return "", ""
 
-        return method()
+        return _type, method()
 
     def _extract_image(self):
         return self.element.img['src']
@@ -55,11 +53,7 @@ class Extractor:
         return links
 
     def as_dict(self):
-        if not self.is_valid():
+        if not self.content or not self._type:
             return {}
 
-        content = self.extract()
-        if not content:
-            return {}
-
-        return {'type': self.content_type, 'content': content}
+        return {'type': self._type, 'content': self.content}
