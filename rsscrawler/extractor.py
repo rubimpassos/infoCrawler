@@ -10,29 +10,6 @@ class Extractor:
     def __init__(self, element):
         self.element = element
 
-    def is_image(self):
-        return self.element.name == 'div' and self.element.img
-
-    def is_text(self):
-        return self.element.name == 'p'
-
-    def is_links(self):
-        return self.element.name == 'div' and self.element.ul
-
-    def extract_image(self):
-        return self.element.img['src']
-
-    def extract_text(self):
-        text = self.element.text or ""
-        return text.strip()
-
-    def extract_links(self):
-        links = []
-        for link in self.element.find_all('a'):
-            links.append(link.get('href'))
-
-        return links
-
     def extract(self):
         type_, content = "", ""
 
@@ -49,3 +26,26 @@ class Extractor:
             content = self.extract_links()
 
         return type_, content
+
+    def is_image(self):
+        return self.element.name == 'div' and self.element.img
+
+    def extract_image(self):
+        return self.element.img['src']
+
+    def is_text(self):
+        return self.element.name == 'p'
+
+    def extract_text(self):
+        text = self.element.text or ""
+        return text.strip()
+
+    def is_links(self):
+        return self.element.name == 'div' and self.element.ul
+
+    def extract_links(self):
+        links = []
+        for link in self.element.find_all('a'):
+            links.append(link.get('href'))
+
+        return links
