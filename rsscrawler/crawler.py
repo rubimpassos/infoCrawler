@@ -3,30 +3,18 @@ import logging
 import json
 import sys
 
-import requests
-
 from bs4 import BeautifulSoup
 
 from rsscrawler.extractor import Extractor
 
+
 logger = logging.getLogger(__name__)
 
 
-def retrieve_feed(url, **kwargs):
-    session = requests.Session()
-    adapter = requests.adapters.HTTPAdapter(max_retries=3)
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
-
-    response = session.get(url, **kwargs)
-    response.raise_for_status()
-    content = response.content
-
-    return content
-
-
-def parsed_description(description):
-    """Returns images, links and paragraphs of the description
+def parse_description(description):
+    """
+     Returns a dictionary with serialized description content(images, links and not empty paragraphs)
+     :param description: The description html text
     :rtype: dict
     """
     description_contents = []

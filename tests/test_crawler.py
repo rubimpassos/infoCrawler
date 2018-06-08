@@ -3,52 +3,9 @@ import os
 from pathlib import Path
 from unittest import TestCase
 
-import mock
 from bs4 import BeautifulSoup
-from requests import HTTPError
 
-from rsscrawler.crawler import parse_feed, parse_item, parsed_description, retrieve_feed
-
-
-class RetrieveFeedTest(TestCase):
-    def _mock_response(self, status=200, content='CONTENT', json_data=None, raise_for_status=None):
-        mock_resp = mock.Mock()
-
-        mock_resp.raise_for_status = mock.Mock()
-        if raise_for_status:
-            mock_resp.raise_for_status.side_effect = raise_for_status
-
-        mock_resp.status_code = status
-        mock_resp.content = content
-
-        if json_data:
-            mock_resp.json = mock.Mock(return_value=json_data)
-
-        return mock_resp
-
-    @mock.patch('requests.Session')
-    def test_retrieve_feed_content(self, mock_session):
-        expected_content = "Test content"
-
-        mock_response = self._mock_response(content=expected_content)
-        session_instance = mock_session.return_value
-        session_instance.get.return_value = mock_response
-
-        response = retrieve_feed('some url')
-
-        self.assertEqual(expected_content, response)
-        session_instance.mount.assert_called()
-        session_instance.get.assert_called_with('some url')
-
-    @mock.patch('requests.Session')
-    def test_retrieve_feed_fail(self, mock_session):
-        mock_response = self._mock_response(status=500, raise_for_status=HTTPError("Rss Feed is down!"))
-        session_instance = mock_session.return_value
-        session_instance.get.return_value = mock_response
-
-        self.assertRaises(HTTPError, retrieve_feed, 'some url')
-        session_instance.mount.assert_called()
-        session_instance.get.assert_called_with('some url')
+from rsscrawler.crawler import parse_feed, parse_item, parse_description
 
 
 class CrawlerTest(TestCase):
