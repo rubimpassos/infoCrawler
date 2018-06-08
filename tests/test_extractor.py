@@ -24,6 +24,18 @@ class ExtractTest(TestCase):
         soup = BeautifulSoup(html, "html.parser")
         return Extractor(soup.find(tag))
 
+    def test_description_content_type_image(self):
+        extractor = self._get_element_extractor(self.image_html, 'div')
+        self.assertEqual("image", extractor.content_type)
+
+    def test_description_content_type_text(self):
+        extractor = self._get_element_extractor(self.text_html, 'p')
+        self.assertEqual("text", extractor.content_type)
+
+    def test_description_content_type_links(self):
+        extractor = self._get_element_extractor(self.links_html, 'div')
+        self.assertEqual("links", extractor.content_type)
+
     def test_extract_image(self):
         extractor = self._get_element_extractor(self.image_html, 'div')
 
@@ -48,15 +60,3 @@ class ExtractTest(TestCase):
         links = extractor.extract()
 
         self.assertListEqual(expected, links)
-
-    def test_description_content_type_image(self):
-        extractor = self._get_element_extractor(self.image_html, 'div')
-        self.assertEqual("image", extractor.content_type)
-
-    def test_description_content_type_text(self):
-        extractor = self._get_element_extractor(self.text_html, 'p')
-        self.assertEqual("text", extractor.content_type)
-
-    def test_description_content_type_links(self):
-        extractor = self._get_element_extractor(self.links_html, 'div')
-        self.assertEqual("links", extractor.content_type)
