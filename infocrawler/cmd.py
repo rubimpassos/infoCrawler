@@ -6,9 +6,6 @@ from pathlib import Path
 from infocrawler.crawler import feed_reader
 
 
-logger = logging.getLogger(__name__)
-
-
 def arguments(args=None):
     parser = ArgumentParser(description='Export rss feed as json.')
     parser.add_argument('url', help='Feed url.')
