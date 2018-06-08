@@ -3,7 +3,7 @@ import sys
 from argparse import ArgumentParser
 from pathlib import Path
 
-from rsscrawler.crawler import feed_reader
+from infocrawler.crawler import feed_reader
 
 
 logger = logging.getLogger(__name__)

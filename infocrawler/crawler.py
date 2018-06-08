@@ -3,8 +3,8 @@ import logging
 
 from bs4 import BeautifulSoup
 
-from rsscrawler.extractor import Extractor
-from rsscrawler.retrivefeed import retrieve_feed
+from infocrawler.extractor import Extractor
+from infocrawler.retrivefeed import retrieve_feed
 
 logger = logging.getLogger(__name__)
 

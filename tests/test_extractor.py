@@ -1,6 +1,6 @@
 from unittest import TestCase
 from bs4 import BeautifulSoup
-from rsscrawler.extractor import Extractor
+from infocrawler.extractor import Extractor
 
 
 class ExtractorTest(TestCase):

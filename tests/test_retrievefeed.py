@@ -3,7 +3,7 @@ from unittest import TestCase
 import mock
 from requests import HTTPError
 
-from rsscrawler.retrivefeed import retrieve_feed
+from infocrawler.retrivefeed import retrieve_feed
 
 
 mock_response = mock.Mock(status=200, content='Test content', json_data=None)

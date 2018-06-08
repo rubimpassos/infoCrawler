@@ -6,7 +6,7 @@ from unittest import TestCase
 import mock
 from bs4 import BeautifulSoup
 
-from rsscrawler.crawler import feed_parser, parse_item, parse_description, feed_reader
+from infocrawler.crawler import feed_parser, parse_item, parse_description, feed_reader
 
 
 class CrawlerTest(TestCase):
