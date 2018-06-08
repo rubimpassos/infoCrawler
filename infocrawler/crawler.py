@@ -76,6 +76,7 @@ def feed_parser(text):
 
 
 def feed_reader(url):
+    """Returns json from feed url"""
     content = retrieve_feed(url)
     d = feed_parser(content)
     json_string = json.dumps(d, ensure_ascii=False)
