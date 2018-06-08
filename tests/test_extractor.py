@@ -4,29 +4,23 @@ from rsscrawler.extractor import Extractor
 
 
 class ExtractorTest(TestCase):
-    def _get_element_extractor(self, html, tag):
-        soup = BeautifulSoup(html, "html.parser")
-        return Extractor(soup.find(tag))
-
     def test_extract_image(self):
         html = '<div><img src="http://www.exemple.org/image.jpg" alt="Exemple Image" /></div>'
-        extractor = self._get_element_extractor(html, 'div')
+        soup = BeautifulSoup(html, "html.parser")
+        extractor = Extractor(soup.div)
 
-        expected = "http://www.exemple.org/image.jpg"
-        type_, content = extractor.extract()
+        expected = "image", "http://www.exemple.org/image.jpg"
 
-        self.assertEqual(expected, content)
-        self.assertEqual("image", type_)
+        self.assertEqual(expected, extractor.extract())
 
     def test_extract_text(self):
         html = '<p>Exemple of captured text</p>'
-        extractor = self._get_element_extractor(html, 'p')
+        soup = BeautifulSoup(html, "html.parser")
+        extractor = Extractor(soup.p)
 
-        expected = "Exemple of captured text"
-        type_, content = extractor.extract()
+        expected = "text", "Exemple of captured text"
 
-        self.assertEqual(expected, content)
-        self.assertEqual("text", type_)
+        self.assertEqual(expected, extractor.extract())
 
     def test_extract_links(self):
         html = """
@@ -38,10 +32,9 @@ class ExtractorTest(TestCase):
             </ul>
         </div>
         """
-        extractor = self._get_element_extractor(html, 'div')
+        soup = BeautifulSoup(html, "html.parser")
+        extractor = Extractor(soup.div)
 
-        expected = ["http://www.exemple.org", "http://www.google.com", "http://www.facebook.com"]
-        type_, content = extractor.extract()
+        expected = "links", ["http://www.exemple.org", "http://www.google.com", "http://www.facebook.com"]
 
-        self.assertListEqual(expected, content)
-        self.assertEqual("links", type_)
+        self.assertEqual(expected, extractor.extract())
