@@ -1,12 +1,26 @@
-Rss Crawler - Export rss feed as json
+Info Rss Crawler - Export rss feed as json
 ===============================================
 
-Rss Crawler is a proposal of solution to the infoGlobo back-end challenge at https://github.com/Infoglobo/desafio-back-end
+InfoCrawler is a proposal of solution to the infoGlobo back-end challenge at https://github.com/Infoglobo/desafio-back-end
 
-Installation and Usage
+Requeriments
 ----------------------
 
-Install Python 3.6 or greater and then simply::
+* Python 3.6
+* BeautifulSoup 4
+* requests
+* mock
 
-    pip install git+https://github.com/rubimpassos/infoCrawler
-  
+
+How to use
+----------------------
+
+You can use as CLI
+    
+    python -m infocrawler "https://revistaautoesporte.globo.com/rss/ultimas/feed.xml" -f "feed.json"
+
+Or API
+
+    from infocrawler.crawler import feed_reader
+    
+    json_string = feed_reader("https://revistaautoesporte.globo.com/rss/ultimas/feed.xml")
