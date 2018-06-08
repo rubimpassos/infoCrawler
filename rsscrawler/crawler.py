@@ -38,7 +38,7 @@ def parsed_description(description):
     for el in soup:
         extractor = Extractor(el)
         content_type = extractor.content_type
-        extracted_content = extractor.extract(content_type)
+        extracted_content = extractor.extract()
 
         if not extracted_content:
             continue

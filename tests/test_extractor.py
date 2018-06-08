@@ -28,7 +28,7 @@ class ExtractTest(TestCase):
         extractor = self._get_element_extractor(self.image_html, 'div')
 
         expected = "http://www.exemple.org/image.jpg"
-        url = extractor.extract("image")
+        url = extractor.extract()
 
         self.assertEqual(expected, url)
 
@@ -37,15 +37,15 @@ class ExtractTest(TestCase):
         extractor = self._get_element_extractor(self.text_html, 'p')
 
         expected = "Exemple of captured text"
-        text = extractor.extract("text")
+        text = extractor.extract()
 
         self.assertEqual(expected, text)
 
     def test_extract_links(self):
-        extractor = self._get_element_extractor(self.links_html, 'ul')
+        extractor = self._get_element_extractor(self.links_html, 'div')
 
         expected = ["http://www.exemple.org", "http://www.google.com", "http://www.facebook.com"]
-        links = extractor.extract("links")
+        links = extractor.extract()
 
         self.assertListEqual(expected, links)
 

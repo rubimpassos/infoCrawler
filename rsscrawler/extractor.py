@@ -1,10 +1,40 @@
 class Extractor:
+    valid_types = ('image', 'text', 'links')
+
     def __init__(self, element):
+        """
+        Extract elements by type that can be serialized
+        p = text
+        div>img = image
+        div>ul = links
+        :param element: A html parsed by BeautifulSoup
+        :type element: BeautifulSoup object
+        """
         self.element = element
+        self.content_type = self.get_content_type()
 
-    def extract(self, _type):
-        method = getattr(self, "_extract_"+_type, None)
+    def get_content_type(self):
 
+        if not self.element.name:
+            return ''
+
+        if self.element.name == 'p':
+            return 'text'
+        elif self.element.ul:
+            return 'links'
+        elif self.element.img:
+            return 'image'
+
+        return ""
+
+    def is_valid(self):
+        return self.content_type in self.valid_types
+
+    def extract(self):
+        if not self.is_valid():
+            return ""
+
+        method = getattr(self, "_extract_"+self.content_type, None)
         if not callable(method):
             return ""
 
@@ -23,17 +53,3 @@ class Extractor:
             links.append(link.get('href'))
 
         return links
-
-    @property
-    def content_type(self):
-        if not self.element.name:
-            return ''
-
-        if self.element.name == 'p':
-            return 'text'
-        elif self.element.ul:
-            return 'links'
-        elif self.element.img:
-            return 'image'
-
-        return ''
