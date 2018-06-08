@@ -34,11 +34,12 @@ def main():
     options = arguments()
     verbosity(options.verbose)
 
+    if options.file and options.file.exists():
+        logger.error("File already exists!")
+        return -1
+
     logger.info("Requesting feed...")
     content = retrieve_feed(options.url)
-    if not content:
-        logger.error("No feed content!")
-        return -1
 
     logger.info("Parsing feed content...")
     d = parse_feed(content)
@@ -50,11 +51,5 @@ def main():
         print(json_string)
         return 0
 
-    f = options.file.resolve()
-    if f.exists():
-        logger.error("File already exists!")
-        return -1
-
-    f.write_text(json_string, encoding='utf-8')
-
+    options.file.write_text(json_string, encoding='utf-8')
     return 0
