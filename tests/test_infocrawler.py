@@ -7,7 +7,7 @@ import mock
 from bs4 import BeautifulSoup
 from requests import HTTPError
 
-import crawler
+from rsscrawler import crawler
 
 
 class RetrieveFeedTest(TestCase):
