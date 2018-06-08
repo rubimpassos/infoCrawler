@@ -1,4 +1,4 @@
-Info Rss Crawler - Export rss feed as json
+Info Crawler - Export rss feed as json
 ===============================================
 
 InfoCrawler is a proposal of solution to the infoGlobo back-end challenge at https://github.com/Infoglobo/desafio-back-end
