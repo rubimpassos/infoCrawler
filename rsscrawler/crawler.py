@@ -1,7 +1,4 @@
-import argparse
 import logging
-import json
-import sys
 
 from bs4 import BeautifulSoup
 
