@@ -1,12 +1,9 @@
-import json
 import logging
-import os
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
 
-from rsscrawler.crawler import feed_parser
-from rsscrawler.retrivefeed import retrieve_feed
+from rsscrawler.crawler import feed_reader
 
 
 logger = logging.getLogger(__name__)
@@ -38,15 +35,7 @@ def main():
     if options.file and options.file.exists():
         sys.exit("File already exists!")
 
-    logger.info("Requesting feed...")
-    content = retrieve_feed(options.url)
-
-    logger.info("Parsing feed content...")
-    d = feed_parser(content)
-
-    logger.info("Dumping into json format...")
-    json_string = json.dumps(d, ensure_ascii=False)
-
+    json_string = feed_reader(options.url)
     if not options.file:
         print(json_string)
         return 0
