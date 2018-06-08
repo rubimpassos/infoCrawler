@@ -7,7 +7,7 @@ import mock
 from bs4 import BeautifulSoup
 from requests import HTTPError
 
-import info_crawler
+import crawler
 
 
 class RetrieveFeedTest(TestCase):
@@ -34,7 +34,7 @@ class RetrieveFeedTest(TestCase):
         session_instance = mock_session.return_value
         session_instance.get.return_value = mock_response
 
-        response = info_crawler.retrieve_feed('some url')
+        response = crawler.retrieve_feed('some url')
 
         self.assertEqual(expected_content, response)
         session_instance.mount.assert_called()
@@ -46,7 +46,7 @@ class RetrieveFeedTest(TestCase):
         session_instance = mock_session.return_value
         session_instance.get.return_value = mock_response
 
-        self.assertRaises(HTTPError, info_crawler.retrieve_feed, 'some url')
+        self.assertRaises(HTTPError, crawler.retrieve_feed, 'some url')
         session_instance.mount.assert_called()
         session_instance.get.assert_called_with('some url')
 
@@ -70,17 +70,17 @@ class CrawlerTest(TestCase):
 
     def test_parsed_description(self):
         expected_desc_dict = self.feed_items[0]['description']
-        result_desc_dict = info_crawler.parsed_description(self.description)
+        result_desc_dict = crawler.parsed_description(self.description)
 
         self.assertEqual(expected_desc_dict, result_desc_dict)
 
     def test_parse_item(self):
         expected_item_dict = self.feed_items[0]
         xml_item = self.xml_soup.item
-        result_item_dict = info_crawler.parse_item(xml_item)
+        result_item_dict = crawler.parse_item(xml_item)
 
         self.assertEqual(expected_item_dict, result_item_dict)
 
     def test_parse_feed(self):
-        expected_feed_dict = info_crawler.parse_feed(self.xml_text_fixture)
+        expected_feed_dict = crawler.parse_feed(self.xml_text_fixture)
         self.assertEqual(expected_feed_dict, self.json_dict_fixture)
