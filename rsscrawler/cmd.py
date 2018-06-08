@@ -2,10 +2,10 @@ import json
 import logging
 import os
 import sys
-from argparse import ArgumentParser, FileType
+from argparse import ArgumentParser
 from pathlib import Path
 
-from rsscrawler.crawler import parse_feed
+from rsscrawler.crawler import feed_parser
 from rsscrawler.retrivefeed import retrieve_feed
 
 
@@ -42,7 +42,7 @@ def main():
     content = retrieve_feed(options.url)
 
     logger.info("Parsing feed content...")
-    d = parse_feed(content)
+    d = feed_parser(content)
 
     logger.info("Dumping into json format...")
     json_string = json.dumps(d, ensure_ascii=False)

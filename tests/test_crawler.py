@@ -6,7 +6,7 @@ from unittest import TestCase
 import mock
 from bs4 import BeautifulSoup
 
-from rsscrawler.crawler import parse_feed, parse_item, parse_description, feed_reader
+from rsscrawler.crawler import feed_parser, parse_item, parse_description, feed_reader
 
 
 class CrawlerTest(TestCase):
@@ -39,12 +39,12 @@ class CrawlerTest(TestCase):
         self.assertEqual(expected, item_contents)
 
     def test_parse_feed(self):
-        expected = parse_feed(self.xml_text_fixture)
+        expected = feed_parser(self.xml_text_fixture)
         self.assertEqual(expected, self.json_dict)
 
-    # @mock.patch('requests.Session.get')
-    # def test_feed_reader(self, mock_get):
-    #     mock_get.return_value = mock.Mock(status=200, content=self.xml_text_fixture, json_data=None)
-    #     expected = json.dumps(self.json_dict)
-    #     json_string = feed_reader('some url')
-    #     self.assertEqual(expected, json_string)
+    @mock.patch('requests.Session.get')
+    def test_feed_reader(self, mock_get):
+        mock_get.return_value = mock.Mock(status=200, content=self.xml_text_fixture, json_data=None)
+        expected = json.dumps(self.json_dict, ensure_ascii=False)
+        json_string = feed_reader('some url')
+        self.assertEqual(expected, json_string)

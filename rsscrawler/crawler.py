@@ -57,7 +57,7 @@ def parse_item(item):
     return new_item
 
 
-def parse_feed(text):
+def feed_parser(text):
     """Parse a xml and format into a dict of feeds
     :param text: a xml data text
     :rtype: dict
@@ -77,7 +77,7 @@ def parse_feed(text):
 
 def feed_reader(url):
     content = retrieve_feed(url)
-    d = parse_feed(content)
+    d = feed_parser(content)
     json_string = json.dumps(d, ensure_ascii=False)
 
     return json_string
