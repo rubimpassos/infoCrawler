@@ -1,7 +1,6 @@
 import json
 import os
-import unittest
-
+from pathlib import Path
 from unittest import TestCase
 
 import mock
@@ -59,32 +58,29 @@ class CrawlerTest(TestCase):
         cls.path_xml_fixture = os.path.join(tests_path, "feed.xml")
         cls.path_json_fixture = os.path.join(tests_path, "feed.json")
 
-        with open(cls.path_xml_fixture, encoding='utf-8') as f:
-            cls.xml_text_fixture = f.read()
-            cls.xml_soup = BeautifulSoup(cls.xml_text_fixture, "xml")
+        cls.xml_text_fixture = Path(tests_path, "feed.xml").read_text(encoding='utf-8')
+        cls.xml_soup = BeautifulSoup(cls.xml_text_fixture, "xml")
 
-        with open(cls.path_json_fixture, encoding='utf-8') as f:
-            cls.json_dict_fixture = json.load(f)
-            cls.feed_items = cls.json_dict_fixture.get('feed')
+        f = Path(tests_path, "feed.json").open(encoding='utf-8')
+        cls.json_dict_fixture = json.load(f)
+        cls.feed_items = cls.json_dict_fixture.get('feed')
+
+        cls.description = cls.xml_soup.item.description.text
+        cls.descr_soup = BeautifulSoup(cls.description, "html.parser")
 
     def test_parsed_description(self):
-        expected_desc_dict = self.feed_items[0].get('description')
-        description = self.xml_soup.find('item').find('description').text
-        result_desc_dict = info_crawler.parsed_description(description)
+        expected_desc_dict = self.feed_items[0]['description']
+        result_desc_dict = info_crawler.parsed_description(self.description)
 
-        self.assertEqual(str(expected_desc_dict), str(result_desc_dict))
+        self.assertEqual(expected_desc_dict, result_desc_dict)
 
     def test_parse_item(self):
         expected_item_dict = self.feed_items[0]
-        xml_item = self.xml_soup.find('item')
+        xml_item = self.xml_soup.item
         result_item_dict = info_crawler.parse_item(xml_item)
 
-        self.assertEqual(str(expected_item_dict), str(result_item_dict))
+        self.assertEqual(expected_item_dict, result_item_dict)
 
     def test_parse_feed(self):
         expected_feed_dict = info_crawler.parse_feed(self.xml_text_fixture)
-        self.assertEqual(str(expected_feed_dict), str(self.json_dict_fixture))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        self.assertEqual(expected_feed_dict, self.json_dict_fixture)
