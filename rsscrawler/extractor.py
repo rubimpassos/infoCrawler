@@ -12,13 +12,13 @@ class Extractor:
         self._type, self.content = self.extract()
 
     def is_image(self):
-        return self.element.name and self.element.img
+        return self.element.name == 'div' and self.element.img
 
     def is_text(self):
         return self.element.name == 'p'
 
     def is_links(self):
-        return self.element.name and self.element.ul
+        return self.element.name == 'div' and self.element.ul
 
     def extract(self):
         _type = ""
@@ -51,9 +51,3 @@ class Extractor:
             links.append(link.get('href'))
 
         return links
-
-    def as_dict(self):
-        if not self.content or not self._type:
-            return {}
-
-        return {'type': self._type, 'content': self.content}
