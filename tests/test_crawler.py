@@ -11,14 +11,14 @@ from rsscrawler.crawler import parse_feed, parse_item, parse_description
 class CrawlerTest(TestCase):
     @classmethod
     def setUpClass(cls):
-        tests_path = os.path.dirname(os.path.realpath(__file__))
-        cls.path_xml_fixture = os.path.join(tests_path, "feed.xml")
-        cls.path_json_fixture = os.path.join(tests_path, "feed.json")
+        base_dir = Path(__file__).parent
+        cls.path_xml_fixture = os.path.join(base_dir, "feed.xml")
+        cls.path_json_fixture = os.path.join(base_dir, "feed.json")
 
-        cls.xml_text_fixture = Path(tests_path, "feed.xml").read_text(encoding='utf-8')
+        cls.xml_text_fixture = Path(base_dir, "feed.xml").read_text(encoding='utf-8')
         cls.xml_soup = BeautifulSoup(cls.xml_text_fixture, "xml")
 
-        f = Path(tests_path, "feed.json").open(encoding='utf-8')
+        f = Path(base_dir, "feed.json").open(encoding='utf-8')
         cls.json_dict = json.load(f)
         cls.feed_item = cls.json_dict['feed'][0]
 
