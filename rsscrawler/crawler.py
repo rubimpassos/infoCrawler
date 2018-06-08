@@ -1,9 +1,10 @@
+import json
 import logging
 
 from bs4 import BeautifulSoup
 
 from rsscrawler.extractor import Extractor
-
+from rsscrawler.retrivefeed import retrieve_feed
 
 logger = logging.getLogger(__name__)
 
@@ -21,14 +22,13 @@ def parse_description(description):
         return description_contents
 
     for el in soup:
-        extractor = Extractor(el)
-        _type, content = extractor._type, extractor.content
+        type_, content = Extractor(el).extract()
 
-        if not _type or not content:
+        if not type_ or not content:
             continue
 
         description_contents.append({
-            'type': _type,
+            'type': type_,
             'content': content
         })
 
@@ -73,3 +73,11 @@ def parse_feed(text):
         items.append(new_item)
 
     return {'feed': items}
+
+
+def feed_reader(url):
+    content = retrieve_feed(url)
+    d = parse_feed(content)
+    json_string = json.dumps(d, ensure_ascii=False)
+
+    return json_string
