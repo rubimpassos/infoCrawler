@@ -35,14 +35,13 @@ def parse_description(description):
 
 def parse_item(item):
     """
-    Return a item dict with a formated title, link and description
-    :param item: A beautifulsoup element with name 'item'
-    :return:
+    Returns a dictionary with seralized item of the feed, with formatted title, link and description
+    :param item: A BeautifulSoup element with name 'item'
     """
     rules = {
         'title': str,
         'link': str,
-        'description': parsed_description
+        'description': parse_description
     }
     new_item = {}
 
@@ -72,40 +71,3 @@ def parse_feed(text):
         items.append(new_item)
 
     return {'feed': items}
-
-
-def arguments(args=None):
-    parser = argparse.ArgumentParser(description='Export rss feed as json.')
-    parser.add_argument('url', help='Feed url.')
-    parser.add_argument('-v', '--verbose', type=int, choices=[1, 2], default=1)
-
-    return parser.parse_args(args)
-
-
-def verbosity(level):
-    if level < 2:
-        return
-
-    root = logging.getLogger()
-    console = logging.StreamHandler(sys.stdout)
-    root.addHandler(console)
-    root.setLevel(logging.DEBUG)
-
-
-def main():
-    options = arguments()
-    verbosity(options.verbose)
-
-    content = retrieve_feed(options.url)
-    if not content:
-        logger.error("No feed content!")
-        return
-
-    d = parse_feed(content)
-    feed_json = json.dumps(d, ensure_ascii=False)
-
-    return feed_json
-
-
-if __name__ == '__main__':
-    print(main())
