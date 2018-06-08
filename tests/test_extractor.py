@@ -28,22 +28,25 @@ class ExtractorTest(TestCase):
         extractor = self._get_element_extractor(self.image_html, 'div')
 
         expected = "http://www.exemple.org/image.jpg"
+        type_, content = extractor.extract()
 
-        self.assertEqual(expected, extractor.content)
-        self.assertEqual("image", extractor._type)
+        self.assertEqual(expected, content)
+        self.assertEqual("image", type_)
 
     def test_extract_text(self):
         extractor = self._get_element_extractor(self.text_html, 'p')
 
         expected = "Exemple of captured text"
+        type_, content = extractor.extract()
 
-        self.assertEqual(expected, extractor.content)
-        self.assertEqual("text", extractor._type)
+        self.assertEqual(expected, content)
+        self.assertEqual("text", type_)
 
     def test_extract_links(self):
         extractor = self._get_element_extractor(self.links_html, 'div')
 
         expected = ["http://www.exemple.org", "http://www.google.com", "http://www.facebook.com"]
+        type_, content = extractor.extract()
 
-        self.assertListEqual(expected, extractor.content)
-        self.assertEqual("links", extractor._type)
+        self.assertListEqual(expected, content)
+        self.assertEqual("links", type_)
